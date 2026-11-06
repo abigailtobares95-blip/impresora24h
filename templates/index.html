@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impresora 24 Horas - Inicio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Impresora 24 Horas</h2>
+        <p>Hola, <strong>{{ usuario }}</strong> 👋</p>
+        
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('cargar_pdf') }}" enctype="multipart/form-data">
+            <label for="archivo_pdf">Sube tu archivo PDF</label>
+            <input type="file" id="archivo_pdf" name="archivo_pdf" accept=".pdf" required>
+
+            <button type="submit">Analizar PDF</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('ver_pedidos') }}" class="btn" style="background-color: #334155; margin-bottom: 10px; display: inline-block; text-decoration: none;">Ver Historial de Pedidos</a>
+            <br>
+            <a href="{{ url_for('logout') }}" style="color: var(--danger); font-size: 0.85rem;">Cerrar sesión</a>
+        </div>
+    </div>
+</body>
+</html>

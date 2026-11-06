@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación 2FA - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 420px; text-align: center;">
+        <h2>Verificación de Dispositivo 🛡️</h2>
+        <p style="margin-bottom: 20px; font-size: 0.9rem; text-align: left; color: var(--text-muted);">
+            Se ha generado un código de seguridad. <strong>Revisa la consola de tu servidor Python</strong> para ver el código de 4 dígitos.
+        </p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_verificar_2fa') }}">
+            <label for="codigo_2fa" style="text-align: left;">Código de 4 dígitos</label>
+            <input type="text" id="codigo_2fa" name="codigo_2fa" required placeholder="Ej: 8492" maxlength="4" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+
+            <!-- Opción para confiar en el equipo -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; text-align: left;">
+                <input type="checkbox" id="confiar" name="confiar" style="width: 20px; height: 20px; margin-bottom: 0; cursor: pointer;">
+                <label for="confiar" style="margin-bottom: 0; cursor: pointer; color: var(--text-color); font-size: 0.9rem;">¿Confiar en este dispositivo? (No pedir código aquí)</label>
+            </div>
+
+            <button type="submit">Verificar e Ingresar</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('admin_login') }}" style="color: var(--text-muted); font-size: 0.85rem;">← Cancelar y volver</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .tab-btn {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <h2>Panel de Administración 🛠️</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- BOTONES DE PESTAÑAS (TABS) -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="cambiarPestana(event, 'seccion-general')">📊 Gestión General</button>
+            <button class="tab-btn" onclick="cambiarPestana(event, 'seccion-seguridad')">🛡️ Seguridad y Accesos</button>
+        </div>
+
+        <!-- PESTAÑA 1: GESTIÓN GENERAL (Precios, Usuarios y Pedidos) -->
+        <div id="seccion-general" class="tab-content active">
+            <!-- Modificar Precios -->
+            <div style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border-color);">
+                <h3 style="margin-top: 0; font-size: 1.1rem; color: #34d399;">🎛️ Modificar Precios de Impresión</h3>
+                <form method="POST" action="{{ url_for('actualizar_precios') }}" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 180px; margin-bottom: 0;">
+                        <label for="precio_bn">Precio B/N ($)</label>
+                        <input type="number" id="precio_bn" name="precio_bn" value="{{ precio_bn }}" required style="margin-bottom: 0;">
+                    </div>
+                    <div style="flex: 1; min-width: 180px; margin-bottom: 0;">
+                        <label for="precio_color">Precio Color ($)</label>
+                        <input type="number" id="precio_color" name="precio_color" value="{{ precio_color }}" required style="margin-bottom: 0;">
+                    </div>
+                    <button type="submit" style="width: auto; padding: 12px 20px; margin-top: 0;">Guardar Precios</button>
+                </form>
+            </div>
+
+            <!-- Cuentas de Usuarios con Opción de Eliminar -->
+            <h3 style="font-size: 1.1rem; margin-bottom: 10px;">👥 Cuentas de Usuarios Registrados</h3>
+            <div style="overflow-x: auto; margin-bottom: 25px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Usuario</th>
+                            <th style="padding: 10px;">Contraseña</th>
+                            <th style="padding: 10px; text-align: center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in usuarios %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td style="padding: 10px;">#{{ u[0] }}</td>
+                            <td style="padding: 10px; font-weight: 600;">{{ u[1] }}</td>
+                            <td style="padding: 10px; color: #fbbf24;">{{ u[2] }}</td>
+                            <td style="padding: 10px; text-align: center;">
+                                <form action="{{ url_for('eliminar_usuario', user_id=u[0]) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar al usuario {{ u[1] }}?');">
+                                    <button type="submit" style="background-color: var(--danger); padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0;">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Historial de Pedidos -->
+            <h3 style="font-size: 1.1rem; margin-bottom: 10px;">📦 Todos los Pedidos del Sistema</h3>
+            <div style="overflow-x: auto; margin-bottom: 25px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Usuario</th>
+                            <th style="padding: 10px;">Documento</th>
+                            <th style="padding: 10px;">Págs</th>
+                            <th style="padding: 10px;">Total</th>
+                            <th style="padding: 10px;">Pago</th>
+                            <th style="padding: 10px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pedidos %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td style="padding: 10px;">#{{ p[0] }}</td>
+                            <td style="padding: 10px;">{{ p[1] }}</td>
+                            <td style="padding: 10px;">{{ p[2] }}</td>
+                            <td style="padding: 10px;">{{ p[4] }}</td>
+                            <td style="padding: 10px; color: #34d399; font-weight: 600;">${{ p[7] }}</td>
+                            <td style="padding: 10px;">{{ p[8] }}</td>
+                            <td style="padding: 10px; color: var(--text-muted);">{{ p[9] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: SEGURIDAD (Credenciales de Admin, 2FA y Dispositivos de Confianza) -->
+        <div id="seccion-seguridad" class="tab-content">
+            <!-- Cambiar Credenciales de Administrador (Corregido a 'actualizar_credenciales') -->
+            <div style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border-color);">
+                <h3 style="margin-top: 0; font-size: 1.1rem; color: #fbbf24;">🔐 Editar Credenciales de Administrador</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Modifica el usuario y contraseña con los que accedes a este panel.</p>
+                <form method="POST" action="{{ url_for('actualizar_credenciales') }}" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 180px; margin-bottom: 0;">
+                        <label for="nuevo_user">Usuario Admin</label>
+                        <input type="text" id="nuevo_user" name="nuevo_user" value="{{ admin_user }}" required style="margin-bottom: 0;">
+                    </div>
+                    <div style="flex: 1; min-width: 180px; margin-bottom: 0;">
+                        <label for="nueva_pass">Nueva Contraseña</label>
+                        <input type="password" id="nueva_pass" name="nueva_pass" required placeholder="Nueva contraseña" style="margin-bottom: 0;">
+                    </div>
+                    <button type="submit" style="width: auto; padding: 12px 20px; margin-top: 0; background-color: #d97706;">Actualizar Admin</button>
+                </form>
+            </div>
+
+            <!-- Gestión de Dispositivos de Confianza (2FA) -->
+            <h3 style="font-size: 1.1rem; margin-bottom: 10px;">💻 Dispositivos Autorizados (2FA Recordado)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Equipos que pueden entrar sin pedir código de 4 dígitos. Si no reconoces alguno, revócale el acceso inmediatamente.</p>
+            <div style="overflow-x: auto; margin-bottom: 25px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Dirección IP</th>
+                            <th style="padding: 10px;">Navegador / Info</th>
+                            <th style="padding: 10px;">Fecha Autorizado</th>
+                            <th style="padding: 10px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in dispositivos %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td style="padding: 10px;">#{{ d[0] }}</td>
+                            <td style="padding: 10px; color: #34d399; font-weight: 600;">{{ d[1] }}</td>
+                            <td style="padding: 10px; font-size: 0.8rem;">{{ d[2] }}</td>
+                            <td style="padding: 10px; color: var(--text-muted);">{{ d[3] }}</td>
+                            <td style="padding: 10px; text-align: center;">
+                                <form action="{{ url_for('revocar_dispositivo', dev_id=d[0]) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas revocar el acceso a este dispositivo?');">
+                                    <button type="submit" style="background-color: var(--danger); padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0;">Quitar Acceso</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="padding: 15px; text-align: center; color: var(--text-muted);">No hay dispositivos de confianza guardados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <a href="{{ url_for('admin_logout') }}" class="btn" style="background-color: var(--danger); text-decoration: none; display: inline-block; width: auto; padding: 10px 20px;">Cerrar Sesión Admin</a>
+        </div>
+    </div>
+
+    <script>
+        function cambiarPestana(evt, idSeccion) {
+            var contenidos = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contenidos.length; i++) {
+                contenidos[i].classList.remove("active");
+            }
+            var botones = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < botones.length; i++) {
+                botones[i].classList.remove("active");
+            }
+            document.getElementById(idSeccion).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>

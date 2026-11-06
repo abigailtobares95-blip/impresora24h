@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrador - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 400px;">
+        <h2>Panel de Administrador</h2>
+        <p style="margin-bottom: 20px;">Paso 1: Credenciales de acceso.</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_login') }}">
+            <label for="admin_user">Usuario Admin</label>
+            <input type="text" id="admin_user" name="admin_user" required placeholder="Usuario (defecto: admin)">
+
+            <label for="admin_password">Contraseña Admin</label>
+            <input type="password" id="admin_password" name="admin_password" required placeholder="Contraseña (defecto: admin123)">
+
+            <button type="submit">Continuar a Verificación 2FA</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('login') }}" style="color: var(--text-muted); font-size: 0.85rem;">← Volver al login de usuarios</a>
+        </div>
+    </div>
+</body>
+</html>

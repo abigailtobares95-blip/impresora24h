@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Pedido - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 520px; text-align: center;">
+        <h2>Resumen del Pedido</h2>
+        
+        <div style="text-align: left; background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+            <p style="text-align: left; margin: 8px 0;">📄 <strong>Documento:</strong> {{ filename }}</p>
+            <p style="text-align: left; margin: 8px 0;">🖨️ <strong>Tipo:</strong> {{ tipo_impresion }}</p>
+            <p style="text-align: left; margin: 8px 0;">📑 <strong>Páginas:</strong> {{ paginas_texto }} (Total: {{ cantidad_paginas }})</p>
+            <p style="text-align: left; margin: 8px 0;">💵 <strong>Precio por página:</strong> ${{ precio_pagina }}</p>
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+            <p style="text-align: left; margin: 8px 0; font-size: 1.1rem; color: #34d399;"><strong>Total a Pagar: ${{ total_pagar }}</strong></p>
+        </div>
+
+        <h3>Código QR para Pago</h3>
+        <p style="margin-bottom: 15px;">Escanea este código con tu billetera virtual</p>
+        <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+            <img src="data:image/png;base64,{{ qr_b64 }}" alt="Código QR de Pago" style="display: block; width: 180px; height: 180px;">
+        </div>
+
+        <form method="POST" action="{{ url_for('confirmar_pago') }}">
+            <input type="hidden" name="filename" value="{{ filename }}">
+            <input type="hidden" name="paginas_texto" value="{{ paginas_texto }}">
+            <input type="hidden" name="cantidad" value="{{ cantidad_paginas }}">
+            <input type="hidden" name="tipo_impresion" value="{{ tipo_impresion }}">
+            <input type="hidden" name="precio_pagina" value="{{ precio_pagina }}">
+            <input type="hidden" name="total" value="{{ total_pagar }}">
+
+            <label for="metodo_pago" style="text-align: left;">Selecciona el método de pago</label>
+            <select id="metodo_pago" name="metodo_pago" required style="margin-bottom: 15px;">
+                <option value="QR">Código QR (Billetera Virtual)</option>
+                <option value="Efectivo">Efectivo (Pago en Local)</option>
+            </select>
+
+            <button type="submit">Confirmar Pago y Generar Ticket</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('index') }}" style="color: var(--text-muted); font-size: 0.85rem;">← Cancelar y volver al inicio</a>
+        </div>
+    </div>
+</body>
+</html>

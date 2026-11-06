@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Pago - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 480px; text-align: center;">
+        <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #34d399; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            🎉 ¡Pago confirmado con éxito!
+        </div>
+
+        <h2>Ticket de Pedido #{{ pedido_id }}</h2>
+        
+        <div style="text-align: left; background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+            <p style="text-align: left; margin: 6px 0;">👤 <strong>Usuario:</strong> {{ usuario }}</p>
+            <p style="text-align: left; margin: 6px 0;">📄 <strong>Documento:</strong> {{ filename }}</p>
+            <p style="text-align: left; margin: 6px 0;">📑 <strong>Páginas:</strong> {{ paginas_texto }} ({{ cantidad }} págs.)</p>
+            <p style="text-align: left; margin: 6px 0;">🖨️ <strong>Tipo:</strong> {{ tipo_impresion }}</p>
+            <p style="text-align: left; margin: 6px 0;">💵 <strong>Precio por página:</strong> ${{ precio_pagina }}</p>
+            <p style="text-align: left; margin: 6px 0;">💳 <strong>Método de pago:</strong> {{ metodo_pago }}</p>
+            <p style="text-align: left; margin: 6px 0;">📅 <strong>Fecha:</strong> {{ fecha }}</p>
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 12px 0;">
+            <p style="text-align: left; margin: 6px 0; font-size: 1.1rem; color: #34d399;"><strong>Total Pagado: ${{ total }}</strong></p>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn" style="margin-bottom: 10px; text-decoration: none;">Imprimir otro documento</a>
+        <a href="{{ url_for('ver_pedidos') }}" class="btn" style="background-color: #334155; text-decoration: none;">Ver Historial de Pedidos</a>
+    </div>
+</body>
+</html>

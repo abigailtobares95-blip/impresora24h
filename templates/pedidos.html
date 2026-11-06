@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pedidos - Impresora 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 750px;">
+        <h2>Historial de Pedidos</h2>
+        
+        {% if pedidos %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Usuario</th>
+                            <th style="padding: 10px;">Documento</th>
+                            <th style="padding: 10px;">Cantidad</th>
+                            <th style="padding: 10px;">Tipo</th>
+                            <th style="padding: 10px;">Total</th>
+                            <th style="padding: 10px;">Pago</th>
+                            <th style="padding: 10px;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pedidos %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td style="padding: 10px;">#{{ p[0] }}</td>
+                            <td style="padding: 10px;">{{ p[1] }}</td>
+                            <td style="padding: 10px;">{{ p[2] }}</td>
+                            <td style="padding: 10px;">{{ p[4] }} págs.</td>
+                            <td style="padding: 10px;">{{ p[5] }}</td>
+                            <td style="padding: 10px; color: #34d399; font-weight: 600;">${{ p[7] }}</td>
+                            <td style="padding: 10px;">{{ p[8] }}</td>
+                            <td style="padding: 10px; color: var(--text-muted);">{{ p[9] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No hay pedidos registrados todavía.</p>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('index') }}" class="btn" style="text-decoration: none; display: inline-block;">Volver al Inicio</a>
+        </div>
+    </div>
+</body>
+</html>
